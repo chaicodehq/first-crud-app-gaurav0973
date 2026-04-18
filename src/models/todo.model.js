@@ -17,13 +17,48 @@ import mongoose from "mongoose";
 
 const todoSchema = new mongoose.Schema(
   {
-    // Your schema fields here
+    title: {
+      type: String,
+      required: [true, "Title is required"],
+      minlength: [3, "Title must be at least 3 characters"],
+      maxlength: [120, "Title must be at most 120 characters"],
+      trim: true,
+    },
+
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (arr) {
+          return arr.length <= 10;
+        },
+        message: "Maximum 10 tags allowed",
+      },
+    },
+
+    dueDate: {
+      type: Date,
+    },
   },
   {
     // Schema options here
+    timestamps: true
   }
 );
 
 // TODO: Add index
+todoSchema.index({ completed: 1, createdAt: -1 });
 
 // TODO: Create and export the Todo model
+export const Todo = mongoose.model("Todo", todoSchema);
